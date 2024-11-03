@@ -49,6 +49,48 @@ jobs:
         run: ./gradlew test
 
       # Run Lint with warning mode (will not block the build)
+      - name: Run lint with warning mode
+        run: ./gradlew lint --continue
+
+      # Build the Project
+      - name: Build gradle project
+        run: ./gradlew build
+
+      # Build APK for Debug
+      - name: Build APK Debug - ${{ env.main_project_module }} module
+        run: ./gradlew assembleDebug
+
+      # Build APK for Release
+      - name: Build APK Release - ${{ env.main_project_module }} module
+        run: ./gradlew assembleRelease
+
+      # Build AAB for Release
+      - name: Build AAB Release - ${{ env.main_project_module }} module
+        run: ./gradlew ${{ env.main_project_module }}:bundleRelease
+
+      # Upload APK Debug as an artifact
+      - name: Upload APK Debug - ${{ env.repository_name }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK Debug
+          path: ${{ env.main_project_module }}/build/outputs/apk/debug/*.apk
+
+      # Upload APK Release as an artifact
+      - name: Upload APK Release - ${{ env.repository_name }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK Release
+          path: ${{ env.main_project_module }}/build/outputs/apk/release/*.apk
+
+      # Upload AAB Release as an artifact
+      - name: Upload AAB Release - ${{ env.repository_name }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - AAB Release
+          path: ${{ env.main_project_module }}/build/outputs/bundle/release/*.aab
+
+
+      # Run Lint with warning mode (will not block the build)
       - name: Ru
 
 
