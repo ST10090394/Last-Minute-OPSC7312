@@ -38,9 +38,17 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
+      # Add suppression for unsupported compile SDK warning
+      - name: Suppress unsupported compile SDK warning
+        run: echo "android.suppressUnsupportedCompileSdk=34" >> ./gradle.properties
+
       # Run Tests
       - name: Run gradle tests
         run: ./gradlew test
+
+      # Run Lint with Continue on Warning
+      - name: Run lint with warning mode
+        run: ./gradlew lint --continue
 
       # Build the Project
       - name: Build gradle project
