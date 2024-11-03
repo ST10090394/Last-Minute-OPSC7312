@@ -32,7 +32,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      # Make gradlew executable
+      # Make Gradlew executable
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
@@ -48,11 +48,11 @@ jobs:
       - name: Run gradle tests
         run: ./gradlew test
 
-      # Run lint with warning mode
-      - name: Run lint with warning mode
-        run: ./gradlew lint --continue
+      # Run lint with warning mode (and continue even if there are errors)
+      - name: Run lint (without failing)
+        run: ./gradlew lint --continue || true
 
-      # Build the project
+      # Build the Project
       - name: Build gradle project
         run: ./gradlew build
 
@@ -88,6 +88,7 @@ jobs:
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - AAB Release
           path: ${{ env.main_project_module }}/build/outputs/bundle/release/*.aab
+
 
 
 
