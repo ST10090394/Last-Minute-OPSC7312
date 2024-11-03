@@ -40,7 +40,7 @@ jobs:
 
       # Add suppression for unsupported compile SDK warning
       - name: Suppress unsupported compile SDK warning
-        run: echo "android.suppressUnsupportedCompileSdk=34" >> ./gradle.properties
+        run: echo -e "\nandroid.suppressUnsupportedCompileSdk=34" >> ./gradle.properties
 
       # Run Tests
       - name: Run gradle tests
