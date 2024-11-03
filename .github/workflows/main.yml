@@ -38,11 +38,11 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      # Set gradle properties
+      # Set gradle properties conditionally
       - name: Set gradle properties
         run: |
-          echo "android.enableJetifier=true" >> ./gradle.properties
-          echo "android.suppressUnsupportedCompileSdk=34" >> ./gradle.properties
+          if ! grep -q "android.enableJetifier=true" ./gradle.properties; then echo "android.enableJetifier=true" >> ./gradle.properties; fi
+          if ! grep -q "android.suppressUnsupportedCompileSdk=34" ./gradle.properties; then echo "android.suppressUnsupportedCompileSdk=34" >> ./gradle.properties; fi
 
       # Run Tests
       - name: Run gradle tests
@@ -88,3 +88,4 @@ jobs:
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
           path: ${{ env.main_project_module }}/build/outputs/bundle/release/*.aab
+
