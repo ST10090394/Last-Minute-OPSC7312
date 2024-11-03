@@ -8,7 +8,7 @@ env:
 on:
   push:
     branches:
-      - 'main'  # Trigger on pushes to main branch
+      - main  # Trigger on pushes to main branch
   workflow_dispatch:  # Allows manual trigger from the Actions tab
 
 jobs:
@@ -16,81 +16,78 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Check out the code from the repository
+      # Checkout code from the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set the current date for use in artifact naming
-      - name: Set current date as env variable
+      # Set current date as an environment variable
+      - name: Set current date as environment variable
         run: echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       # Set up Java 17
-      - name: Set Up JDK
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
           cache: 'gradle'
 
-      # Make Gradlew executable
-      - name: Change wrapper permissions
+      # Make gradlew executable
+      - name: Make gradlew executable
         run: chmod +x ./gradlew
 
       # Set gradle properties without duplicate entries
       - name: Set gradle properties
         run: |
-          sed -i '/^android.enableJetifier=/d' ./gradle.properties
+          sed -i '/^android\.enableJetifier=/d' ./gradle.properties
           echo "android.enableJetifier=true" >> ./gradle.properties
-          sed -i '/^android.suppressUnsupportedCompileSdk=/d' ./gradle.properties
+          sed -i '/^android\.suppressUnsupportedCompileSdk=/d' ./gradle.properties
           echo "android.suppressUnsupportedCompileSdk=34" >> ./gradle.properties
 
-      # Run Tests
+      # Run unit tests
       - name: Run gradle tests
         run: ./gradlew test
 
-      # Run Lint with warning mode (will not block the build)
+      # Run lint with warning mode
       - name: Run lint with warning mode
         run: ./gradlew lint --continue
 
-      # Build the Project
+      # Build the project
       - name: Build gradle project
         run: ./gradlew build
 
       # Build APK for Debug
-      - name: Build APK Debug - ${{ env.main_project_module }} module
+      - name: Build APK Debug
         run: ./gradlew assembleDebug
 
       # Build APK for Release
-      - name: Build APK Release - ${{ env.main_project_module }} module
+      - name: Build APK Release
         run: ./gradlew assembleRelease
 
       # Build AAB for Release
-      - name: Build AAB Release - ${{ env.main_project_module }} module
+      - name: Build AAB Release
         run: ./gradlew ${{ env.main_project_module }}:bundleRelease
 
       # Upload APK Debug as an artifact
-      - name: Upload APK Debug - ${{ env.repository_name }}
+      - name: Upload APK Debug
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK Debug
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - APK Debug
           path: ${{ env.main_project_module }}/build/outputs/apk/debug/*.apk
 
       # Upload APK Release as an artifact
-      - name: Upload APK Release - ${{ env.repository_name }}
+      - name: Upload APK Release
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK Release
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - APK Release
           path: ${{ env.main_project_module }}/build/outputs/apk/release/*.apk
 
       # Upload AAB Release as an artifact
-      - name: Upload AAB Release - ${{ env.repository_name }}
+      - name: Upload AAB Release
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - AAB Release
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - AAB Release
           path: ${{ env.main_project_module }}/build/outputs/bundle/release/*.aab
 
-
-      # Run Lint with warning mode (will not block the build)
-      - name: Ru
 
 
