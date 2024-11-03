@@ -7,6 +7,13 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+public void navigateToMainActivity(View view) {
+    // Create an intent to navigate to MainActivity
+    Intent intent = new Intent(this, MainActivity.class);
+    // Start the activity
+    startActivity(intent);
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
