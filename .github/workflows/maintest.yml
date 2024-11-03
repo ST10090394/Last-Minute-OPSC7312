@@ -10,9 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      # Environment variables for secrets can be set here if needed
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -62,3 +59,4 @@ jobs:
       with:
         name: app-release
         path: app/build/outputs/apk/release/*.apk
+
