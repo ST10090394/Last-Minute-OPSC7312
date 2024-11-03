@@ -1,44 +1,42 @@
-name: Generated APK AAB (Upload - Create Artifact To Github Action)
+name: Android CI/CD - Build and Upload APK & AAB
 
 env:
-  # The name of the main module repository
-  main_project_module: app
-  # The name of the Play Store
-  playstore_name: CarSpotter
-  # Repository name
-  repository_name: Last-Minute-OPSC7312
+  main_project_module: app  # Main module name
+  playstore_name: CarSpotter  # App name for Play Store
+  repository_name: Last-Minute-OPSC7312  # Repository name
 
 on:
-  # Trigger on push to the release branch (or adjust this if you have another branch name)
   push:
     branches:
-      - 'release'
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+      - 'main'  # Trigger on pushes to main branch
+  workflow_dispatch:  # Allows manual trigger from the Actions tab
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      # Check out the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # Set Current Date As Env Variable
+      # Set the current date for use in artifact naming
       - name: Set current date as env variable
         run: echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
+      # Set up Java 17
       - name: Set Up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu' # Use 'zulu' for an open-source JDK
+          distribution: 'zulu'
           java-version: '17'
           cache: 'gradle'
 
-      # Change permissions for the gradlew script to make it executable
+      # Make Gradlew executable
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      # Set gradle properties conditionally
+      # Configure Gradle properties, avoiding duplicates
       - name: Set gradle properties
         run: |
           if ! grep -q "android.enableJetifier=true" ./gradle.properties; then echo "android.enableJetifier=true" >> ./gradle.properties; fi
@@ -48,7 +46,7 @@ jobs:
       - name: Run gradle tests
         run: ./gradlew test
 
-      # Run Lint with Continue on Warning
+      # Run Lint with warning mode (will not block the build)
       - name: Run lint with warning mode
         run: ./gradlew lint --continue
 
@@ -56,36 +54,37 @@ jobs:
       - name: Build gradle project
         run: ./gradlew build
 
-      # Create APK Debug
-      - name: Build apk debug project (APK) - ${{ env.main_project_module }} module
+      # Build APK for Debug
+      - name: Build APK Debug - ${{ env.main_project_module }} module
         run: ./gradlew assembleDebug
 
-      # Create APK Release
-      - name: Build apk release project (APK) - ${{ env.main_project_module }} module
-        run: ./gradlew assemble
+      # Build APK for Release
+      - name: Build APK Release - ${{ env.main_project_module }} module
+        run: ./gradlew assembleRelease
 
-      # Create Bundle AAB Release
-      - name: Build app bundle release (AAB) - ${{ env.main_project_module }} module
+      # Build AAB for Release
+      - name: Build AAB Release - ${{ env.main_project_module }} module
         run: ./gradlew ${{ env.main_project_module }}:bundleRelease
 
-      # Upload APK Debug
+      # Upload APK Debug as an artifact
       - name: Upload APK Debug - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK Debug
           path: ${{ env.main_project_module }}/build/outputs/apk/debug/*.apk
 
-      # Upload APK Release
+      # Upload APK Release as an artifact
       - name: Upload APK Release - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK Release
           path: ${{ env.main_project_module }}/build/outputs/apk/release/*.apk
 
-      # Upload AAB (App Bundle) Release
-      - name: Upload AAB (App Bundle) Release - ${{ env.repository_name }}
+      # Upload AAB Release as an artifact
+      - name: Upload AAB Release - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - AAB Release
           path: ${{ env.main_project_module }}/build/outputs/bundle/release/*.aab
+
 
