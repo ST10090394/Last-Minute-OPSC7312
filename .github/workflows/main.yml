@@ -1,44 +1,56 @@
-name: Android CI/CD
+name: Generated APK AAB (Upload - Create Artifact To Github Action)
+
+env:
+  # The name of the main module repository
+  main_project_module: app
+
+  # The name of the Play Store
+  playstore_name: CarSpotter
+
+  # Repository name
+  repository_name: Last-Minute-OPSC7312
 
 on:
   push:
     branches:
-      - main
-  pull_request:
+      - 'release/**'
+  
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      MAPBOX_DOWNLOADS_TOKEN: ${{ secrets.MUAAZ_SECRET }}
-      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
-      main_project_module: app
-      playstore_name: CarSpotter
-      repository_name: Last-Minute-OPSC7312
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up JDK
+      # Set Current Date As Env Variable
+      - name: Set current date as env variable
+        run: echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Set Up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
+          distribution: 'zulu' # See 'Supported distributions' for available options
           java-version: '17'
           cache: 'gradle'
 
       - name: Grant Execute Permission for Gradlew
         run: chmod +x ./gradlew
 
-      - name: Suppress Unsupported Compile SDK Warning
-        run: echo "android.suppressUnsupportedCompileSdk=34" >> ./gradle.properties
+      # Set up Mapbox Token as Environment Variable
+      - name: Set Mapbox Token as Environment Variable
+        run: echo "MAPBOX_DOWNLOADS_TOKEN=${{ secrets.MUAAZ_SECRET }}" >> $GITHUB_ENV
 
-      - name: Disable Gradle Configuration Cache
-        run: echo "org.gradle.unsafe.configuration-cache=false" >> ./gradle.properties
+      # Run Tests Build
+      - name: Run gradle tests
+        run: ./gradlew test
+        env:
+          MAPBOX_DOWNLOADS_TOKEN: ${{ secrets.MUAAZ_SECRET }}
 
-      # Run the Gradle build with the MAPBOX_DOWNLOADS_TOKEN environment variable
-      - name: Build with Gradle
+      # Run Build Project
+      - name: Build gradle project
         run: ./gradlew build --warning-mode all
         env:
           MAPBOX_DOWNLOADS_TOKEN: ${{ secrets.MUAAZ_SECRET }}
@@ -75,8 +87,8 @@ jobs:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
           path: ${{ env.main_project_module }}/build/outputs/apk/release/*.apk
 
-      # Upload AAB (App Bundle) Release
-      - name: Upload AAB (App Bundle) Release - ${{ env.repository_name }}
+      # Upload AAB Release
+      - name: Upload AAB Release - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
