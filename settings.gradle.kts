@@ -1,4 +1,4 @@
-import org.gradle.internal.impldep.org.jsoup.Connection.Base
+import org.gradle.authentication.http.BasicAuthentication
 
 pluginManagement {
     repositories {
@@ -7,7 +7,6 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -21,7 +20,7 @@ dependencyResolutionManagement {
             }
             credentials {
                 username = "mapbox"
-                password = System.getenv("MAPBOX_DOWNLOADS_TOKEN") ?: "sk.eyJ1Ijoia2luZ2pvcmRhbjIwMDAiLCJhIjoiY2xueDV0MWFsMGJudTJrcWs2bGdyaWo5cCJ9.6BD1BnugkOcxfX6MixN07g"
+                password = System.getenv("MAPBOX_DOWNLOADS_TOKEN") ?: "YOUR_MAPBOX_TOKEN"
             }
         }
     }
