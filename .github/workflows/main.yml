@@ -34,9 +34,8 @@ jobs:
       - name: Suppress Unsupported Compile SDK Warning
         run: echo "android.suppressUnsupportedCompileSdk=34" >> ./gradle.properties
 
-      # Set up Mapbox Token explicitly as an environment variable
-      - name: Set Mapbox Token Environment Variable
-        run: echo "MAPBOX_DOWNLOADS_TOKEN=${{ secrets.MUAAZ_SECRET }}" >> $GITHUB_ENV
+      - name: Disable Gradle Configuration Cache
+        run: echo "org.gradle.unsafe.configuration-cache=false" >> ./gradle.properties
 
       # Run the Gradle build with the MAPBOX_DOWNLOADS_TOKEN environment variable
       - name: Build with Gradle
@@ -77,6 +76,10 @@ jobs:
           path: ${{ env.main_project_module }}/build/outputs/apk/release/*.apk
 
       # Upload AAB (App Bundle) Release
-   
+      - name: Upload AAB (App Bundle) Release - ${{ env.repository_name }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
+          path: ${{ env.main_project_module }}/build/outputs/bundle/release/*.aab
 
 
