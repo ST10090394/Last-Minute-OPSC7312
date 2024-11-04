@@ -20,7 +20,7 @@ dependencyResolutionManagement {
             }
             credentials {
                 username = "mapbox"
-                password = System.getenv("MUAAZ_SECRET")
+                password = System.getenv("MAPBOX_DOWNLOADS_TOKEN")
             }
         }
     }
@@ -28,5 +28,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "CarSpotterOPSC7312"
 include(":app")
+
 
 
