@@ -2,6 +2,7 @@ package com.example.carspotteropsc7312poe.observation
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.FirebaseApp
 import com.example.carspotteropsc7312poe.DashboardActivity
+import com.example.carspotteropsc7312poe.MainActivity
 import com.example.carspotteropsc7312poe.R
 import com.example.carspotteropsc7312poe.databinding.ActivityAddObservationBinding
 import com.example.carspotteropsc7312poe.dataclass.UserObservation
@@ -40,6 +42,11 @@ class AddObservationActivity : AppCompatActivity() {
         }
     }
 
+    // Add the missing navigateToMainActivity method
+    fun navigateToMainActivity(view: View) {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+    }
 
     private fun saveObservation() {
         val CarName = binding.etCarName.text.toString()
@@ -88,6 +95,13 @@ class AddObservationActivity : AppCompatActivity() {
                     showToast("Failed to save observation. Please try again.")
                 }
             }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+}
+
 
     }
 
