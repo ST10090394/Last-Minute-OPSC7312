@@ -1,4 +1,4 @@
-import org.gradle.internal.impldep.org.jsoup.Connection.Base
+import org.gradle.authentication.http.BasicAuthentication
 
 pluginManagement {
     repositories {
@@ -7,6 +7,7 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -19,7 +20,7 @@ dependencyResolutionManagement {
             }
             credentials {
                 username = "mapbox"
-                password = System.getenv("MAPBOX_DOWNLOADS_TOKEN") ?: "sk.eyJ1Ijoia2luZ2pvcmRhbjIwMDAiLCJhIjoiY2xueDV0MWFsMGJudTJrcWs2bGdyaWo5cCJ9.6BD1BnugkOcxfX6MixN07g"
+                password = "pk.eyJ1Ijoic3QxMDA5MDM5NCIsImEiOiJjbTMyemh1Z2cxaTR0Mm5zYzM0em4xZWFoIn0.LahtMzGsj60U7BKoAP9m2w"
             }
         }
     }
@@ -27,3 +28,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "CarSpotterOPSC7312"
 include(":app")
+
