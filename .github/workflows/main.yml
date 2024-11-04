@@ -12,6 +12,10 @@ jobs:
 
     env:
       MAPBOX_DOWNLOADS_TOKEN: ${{ secrets.MUAAZ_SECRET }}
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+      main_project_module: app
+      playstore_name: CarSpotter
+      repository_name: Last-Minute-OPSC7312
 
     steps:
       - name: Checkout Repository
@@ -30,24 +34,54 @@ jobs:
       - name: Suppress Unsupported Compile SDK Warning
         run: echo "android.suppressUnsupportedCompileSdk=34" >> ./gradle.properties
 
-      # Set up Mapbox Token
-      - name: Set Mapbox Token
+      # Set up Mapbox Token explicitly as an environment variable
+      - name: Set Mapbox Token Environment Variable
         run: echo "MAPBOX_DOWNLOADS_TOKEN=${{ secrets.MUAAZ_SECRET }}" >> $GITHUB_ENV
 
-      # Run Lint with Continue on Warning
-      - name: Run lint with warning mode
-        run: ./gradlew lint --continue --warning-mode all
-
+      # Run the Gradle build with the MAPBOX_DOWNLOADS_TOKEN environment variable
       - name: Build with Gradle
         run: ./gradlew build --warning-mode all
+        env:
+          MAPBOX_DOWNLOADS_TOKEN: ${{ secrets.MUAAZ_SECRET }}
 
-      # Upload Build Artifacts
-      - name: Upload APK Debug
+      # Create APK Debug
+      - name: Build apk debug project (APK) - ${{ env.main_project_module }} module
+        run: ./gradlew assembleDebug
+        env:
+          MAPBOX_DOWNLOADS_TOKEN: ${{ secrets.MUAAZ_SECRET }}
+
+      # Create APK Release
+      - name: Build apk release project (APK) - ${{ env.main_project_module }} module
+        run: ./gradlew assembleRelease
+        env:
+          MAPBOX_DOWNLOADS_TOKEN: ${{ secrets.MUAAZ_SECRET }}
+
+      # Create Bundle AAB Release
+      - name: Build app bundle release (AAB) - ${{ env.main_project_module }} module
+        run: ./gradlew ${{ env.main_project_module }}:bundleRelease
+        env:
+          MAPBOX_DOWNLOADS_TOKEN: ${{ secrets.MUAAZ_SECRET }}
+
+      # Upload APK Debug
+      - name: Upload APK Debug - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: APK Debug
-          path: app/build/outputs/apk/debug/*.apk
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated
+          path: ${{ env.main_project_module }}/build/outputs/apk/debug/*.apk
 
+      # Upload APK Release
+      - name: Upload APK Release - ${{ env.repository_name }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
+          path: ${{ env.main_project_module }}/build/outputs/apk/release/*.apk
+
+      # Upload AAB (App Bundle) Release
+      - name: Upload AAB (App Bundle) Release - ${{ env.repository_name }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
+          path: ${{ env.main_project_module }}/build/outputs/bundle/release/*.aab
 
 
 
